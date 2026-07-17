@@ -5,11 +5,14 @@ import 'react-toastify/dist/ReactToastify.css';
 const App = () => {
   const [input, setInput] = useState("");
   const [todos, setTodos] = useState(() => {
-    const saveTodos = localStorage.getItem("todos");
-    if (saveTodos) {
-      return JSON.parse(saveTodos);
-    }
-    return [];
+   try{
+    const saveTodos = localStorage.getItem("todos")
+    return saveTodos ? JSON.parse(saveTodos) : []
+   }catch (error){
+    console.error("Invalid localStorage data:", error);
+    localStorage.removeItem("todos")
+    return []
+   }
   });
 
   useEffect(() => {
@@ -89,7 +92,9 @@ const App = () => {
           <input type="text" placeholder='What needs to be done?' 
             className="flex-1 border border-gray-300 p-3 rounded-md outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all" 
             value={input} 
-            onChange={handleChange}  />
+            onChange={handleChange} onKeyDown={(e)=>{if(e.key === "Enter"){
+              handleAddTodo()
+            }}} />
           <button className='bg-blue-600 hover:bg-blue-700 text-white font-medium px-6 rounded-md shadow-sm transition-all'
             onClick={handleAddTodo}>
             {edit ? "Update" : "Add Task"}
